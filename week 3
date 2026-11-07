@@ -1,0 +1,614 @@
+task 1
+#include <iostream>
+using namespace std;
+
+template <class Type>
+class List
+{
+protected:
+    Type* arr;
+    int maxSize;
+    int currentSize;
+
+public:
+    List(int size = 10)
+    {
+        maxSize = size;
+        currentSize = 0;
+        arr = new Type[maxSize];
+    }
+
+    List(const List& obj)
+    {
+        maxSize = obj.maxSize;
+        currentSize = obj.currentSize;
+
+        arr = new Type[maxSize];
+
+        for (int i = 0; i < currentSize; i++)
+        {
+            arr[i] = obj.arr[i];
+        }
+    }
+
+    virtual void addElementAtFirstIndex(Type value) = 0;
+
+    virtual void addElementAtLastIndex(Type value) = 0;
+
+    virtual Type removeElementFromEnd() = 0;
+
+    virtual void removeElementFromStart() = 0;
+
+    virtual ~List()
+    {
+        delete[] arr;
+    }
+};
+
+task 2
+
+#pragma once
+#include <iostream>
+#include "List.h"
+using namespace std;
+
+template <class Type>
+class MyList : public List<Type>
+{
+public:
+    MyList(int size = 10) : List<Type>(size)
+    {
+    }
+
+    MyList(const MyList& obj) : List<Type>(obj)
+    {
+    }
+
+    bool empty()
+    {
+        return this->currentSize == 0;
+    }
+
+    bool full()
+    {
+        return this->currentSize == this->maxSize;
+    }
+
+    int size()
+    {
+        return this->currentSize;
+    }
+
+    void addElementAtFirstIndex(Type value)
+    {
+        if (full())
+        {
+            cout << "List is full" << endl;
+            return;
+        }
+
+        for (int i = this->currentSize; i > 0; i--)
+        {
+            this->arr[i] = this->arr[i - 1];
+        }
+
+        this->arr[0] = value;
+        this->currentSize++;
+    }
+
+    void addElementAtLastIndex(Type value)
+    {
+        if (full())
+        {
+            cout << "List is full" << endl;
+            return;
+        }
+
+        this->arr[this->currentSize] = value;
+        this->currentSize++;
+    }
+
+    Type removeElementFromEnd()
+    {
+        if (empty())
+        {
+            cout << "List is empty" << endl;
+            return Type();
+        }
+
+        Type value = this->arr[this->currentSize - 1];
+        this->currentSize--;
+
+        return value;
+    }
+
+    void removeElementFromStart()
+    {
+        if (empty())
+        {
+            cout << "List is empty" << endl;
+            return;
+        }
+
+        for (int i = 0; i < this->currentSize - 1; i++)
+        {
+            this->arr[i] = this->arr[i + 1];
+        }
+
+        this->currentSize--;
+    }
+
+    bool insertAt(int index, Type value)
+    {
+        if (full() || index < 0 || index > this->currentSize)
+        {
+            return false;
+        }
+
+        for (int i = this->currentSize; i > index; i--)
+        {
+            this->arr[i] = this->arr[i - 1];
+        }
+
+        this->arr[index] = value;
+        this->currentSize++;
+
+        return true;
+    }
+
+    Type last()
+    {
+        if (empty())
+        {
+            cout << "List is empty" << endl;
+            return Type();
+        }
+
+        return this->arr[this->currentSize - 1];
+    }
+
+    bool search(Type value)
+    {
+        for (int i = 0; i < this->currentSize; i++)
+        {
+            if (this->arr[i] == value)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    void display()
+    {
+        if (empty())
+        {
+            cout << "List is empty" << endl;
+            return;
+        }
+
+        for (int i = 0; i < this->currentSize; i++)
+        {
+            cout << this->arr[i] << " ";
+        }
+
+        cout << endl;
+    }
+
+    ~MyList()
+    {
+    }
+};
+
+
+task 3
+
+#pragma once
+#include <iostream>
+#include "MyList.h"
+using namespace std;
+
+template <class Type>
+class CustomList : public MyList<Type>
+{
+public:
+    CustomList(int size = 10) : MyList<Type>(size)
+    {
+    }
+
+    CustomList(const CustomList& obj) : MyList<Type>(obj)
+    {
+    }
+
+    Type sum_ofPrime()
+    {
+        Type sum = 0;
+
+        for (int i = 0; i < this->currentSize; i++)
+        {
+            Type num = this->arr[i];
+            bool prime = true;
+
+            if (num < 2)
+            {
+                prime = false;
+            }
+
+            for (int j = 2; j < num; j++)
+            {
+                if (num % j == 0)
+                {
+                    prime = false;
+                    break;
+                }
+            }
+
+            if (prime)
+            {
+                sum = sum + num;
+            }
+        }
+
+        return sum;
+    }
+
+    Type secondMaxEven()
+    {
+        Type max = 0;
+        Type second = 0;
+        bool foundMax = false;
+        bool foundSecond = false;
+
+        for (int i = 0; i < this->currentSize; i++)
+        {
+            Type num = this->arr[i];
+
+            if (num % 2 == 0)
+            {
+                if (!foundMax || num > max)
+                {
+                    if (foundMax)
+                    {
+                        second = max;
+                        foundSecond = true;
+                    }
+
+                    max = num;
+                    foundMax = true;
+                }
+                else if (num < max && (!foundSecond || num > second))
+                {
+                    second = num;
+                    foundSecond = true;
+                }
+            }
+        }
+
+        if (foundSecond)
+            return second;
+
+        return Type();
+    }
+
+    Type secondMinOdd()
+    {
+        Type min = 0;
+        Type second = 0;
+        bool foundMin = false;
+        bool foundSecond = false;
+
+        for (int i = 0; i < this->currentSize; i++)
+        {
+            Type num = this->arr[i];
+
+            if (num % 2 != 0)
+            {
+                if (!foundMin || num < min)
+                {
+                    if (foundMin)
+                    {
+                        second = min;
+                        foundSecond = true;
+                    }
+
+                    min = num;
+                    foundMin = true;
+                }
+                else if (num > min && (!foundSecond || num < second))
+                {
+                    second = num;
+                    foundSecond = true;
+                }
+            }
+        }
+
+        if (foundSecond)
+            return second;
+
+        return Type();
+    }
+
+    void printDuplicates()
+    {
+        bool found = false;
+
+        for (int i = 0; i < this->currentSize; i++)
+        {
+            bool alreadyPrinted = false;
+
+            for (int k = 0; k < i; k++)
+            {
+                if (this->arr[i] == this->arr[k])
+                {
+                    alreadyPrinted = true;
+                    break;
+                }
+            }
+
+            if (alreadyPrinted)
+                continue;
+
+            for (int j = i + 1; j < this->currentSize; j++)
+            {
+                if (this->arr[i] == this->arr[j])
+                {
+                    cout << this->arr[i] << " ";
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        if (!found)
+            cout << "No duplicates found";
+
+        cout << endl;
+    }
+
+    void rotateClockwaise(int r)
+    {
+        int mid = this->currentSize / 2;
+
+        for (int part = 0; part < 2; part++)
+        {
+            int start, end;
+
+            if (part == 0)
+            {
+                start = 0;
+                end = mid;
+            }
+            else
+            {
+                start = mid;
+                end = this->currentSize;
+            }
+
+            int n = end - start;
+
+            if (n > 1)
+            {
+                r = r % n;
+
+                for (int x = 0; x < r; x++)
+                {
+                    Type temp = this->arr[end - 1];
+
+                    for (int i = end - 1; i > start; i--)
+                    {
+                        this->arr[i] = this->arr[i - 1];
+                    }
+
+                    this->arr[start] = temp;
+                }
+            }
+        }
+    }
+
+    void rotateanitclockwaise(int rt)
+    {
+        int mid = this->currentSize / 2;
+
+        for (int part = 0; part < 2; part++)
+        {
+            int start, end;
+
+            if (part == 0)
+            {
+                start = 0;
+                end = mid;
+            }
+            else
+            {
+                start = mid;
+                end = this->currentSize;
+            }
+
+            int n = end - start;
+
+            if (n > 1)
+            {
+                int rotations = rt % n;
+
+                for (int x = 0; x < rotations; x++)
+                {
+                    Type temp = this->arr[start];
+
+                    for (int i = start; i < end - 1; i++)
+                    {
+                        this->arr[i] = this->arr[i + 1];
+                    }
+
+                    this->arr[end - 1] = temp;
+                }
+            }
+        }
+    }
+
+    ~CustomList()
+    {
+    }
+};
+
+task 4
+
+#include <iostream>
+#include "CustomList.h"
+using namespace std;
+
+int main()
+{
+    CustomList<int> list(20);
+
+    int choice, value, index, rotations;
+
+    do
+    {
+        cout << "\n----- Generic List Menu -----" << endl;
+        cout << "1. Add at first index" << endl;
+        cout << "2. Add at last index" << endl;
+        cout << "3. Remove from end" << endl;
+        cout << "4. Remove from start" << endl;
+        cout << "5. Check empty" << endl;
+        cout << "6. Check full" << endl;
+        cout << "7. Display size" << endl;
+        cout << "8. Insert at index" << endl;
+        cout << "9. Display last element" << endl;
+        cout << "10. Search element" << endl;
+        cout << "11. Display list" << endl;
+        cout << "12. Sum of prime numbers" << endl;
+        cout << "13. Second maximum even" << endl;
+        cout << "14. Second minimum odd" << endl;
+        cout << "15. Print duplicates" << endl;
+        cout << "16. Rotate clockwise" << endl;
+        cout << "17. Rotate anti-clockwise" << endl;
+        cout << "0. Exit" << endl;
+
+        cout << "Enter choice: ";
+        cin >> choice;
+
+        switch (choice)
+        {
+        case 1:
+            cout << "Enter value: ";
+            cin >> value;
+            list.addElementAtFirstIndex(value);
+            break;
+
+        case 2:
+            cout << "Enter value: ";
+            cin >> value;
+            list.addElementAtLastIndex(value);
+            break;
+
+        case 3:
+            cout << "Removed value: "
+                 << list.removeElementFromEnd() << endl;
+            break;
+
+        case 4:
+            list.removeElementFromStart();
+            cout << "Element removed" << endl;
+            break;
+
+        case 5:
+            if (list.empty())
+                cout << "List is empty" << endl;
+            else
+                cout << "List is not empty" << endl;
+            break;
+
+        case 6:
+            if (list.full())
+                cout << "List is full" << endl;
+            else
+                cout << "List is not full" << endl;
+            break;
+
+        case 7:
+            cout << "Current size: " << list.size() << endl;
+            break;
+
+        case 8:
+            cout << "Enter index: ";
+            cin >> index;
+
+            cout << "Enter value: ";
+            cin >> value;
+
+            if (list.insertAt(index, value))
+                cout << "Value inserted" << endl;
+            else
+                cout << "Invalid index or list is full" << endl;
+            break;
+
+        case 9:
+            cout << "Last element: " << list.last() << endl;
+            break;
+
+        case 10:
+            cout << "Enter value to search: ";
+            cin >> value;
+
+            if (list.search(value))
+                cout << "Value found" << endl;
+            else
+                cout << "Value not found" << endl;
+            break;
+
+        case 11:
+            list.display();
+            break;
+
+        case 12:
+            cout << "Sum of prime numbers: "
+                 << list.sum_ofPrime() << endl;
+            break;
+
+        case 13:
+            cout << "Second maximum even: "
+                 << list.secondMaxEven() << endl;
+            break;
+
+        case 14:
+            cout << "Second minimum odd: "
+                 << list.secondMinOdd() << endl;
+            break;
+
+        case 15:
+            cout << "Duplicate elements: ";
+            list.printDuplicates();
+            break;
+
+        case 16:
+            cout << "Enter rotations: ";
+            cin >> rotations;
+
+            list.rotateClockwaise(rotations);
+            cout << "List after rotation: ";
+            list.display();
+            break;
+
+        case 17:
+            cout << "Enter rotations: ";
+            cin >> rotations;
+
+            list.rotateanitclockwaise(rotations);
+            cout << "List after rotation: ";
+            list.display();
+            break;
+
+        case 0:
+            cout << "Program ended" << endl;
+            break;
+
+        default:
+            cout << "Invalid choice" << endl;
+        }
+
+    } while (choice != 0);
+
+    return 0;
+}
+
