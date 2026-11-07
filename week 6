@@ -1,0 +1,841 @@
+task 1
+#include <iostream>
+using namespace std;
+
+class Node
+{
+public:
+    int data;
+    Node* next;
+
+    Node(int value)
+    {
+        data = value;
+        next = nullptr;
+    }
+};
+
+class LinkedList
+{
+private:
+    Node* head;
+
+public:
+    LinkedList()
+    {
+        head = nullptr;
+    }
+
+    void CreateNode(int value)
+    {
+        Node* newNode = new Node(value);
+
+        if (head == nullptr)
+        {
+            head = newNode;
+            return;
+        }
+
+        Node* temp = head;
+
+        while (temp->next != nullptr)
+        {
+            temp = temp->next;
+        }
+
+        temp->next = newNode;
+    }
+
+    void Display()
+    {
+        Node* temp = head;
+
+        if (head == nullptr)
+        {
+            cout << "List is empty.";
+            return;
+        }
+
+        while (temp != nullptr)
+        {
+            cout << temp->data << " ";
+            temp = temp->next;
+        }
+    }
+
+    ~LinkedList()
+    {
+        Node* temp;
+
+        while (head != nullptr)
+        {
+            temp = head;
+            head = head->next;
+            delete temp;
+        }
+    }
+};
+
+int main()
+{
+    LinkedList list;
+
+    list.CreateNode(10);
+    list.CreateNode(20);
+    list.CreateNode(30);
+    list.CreateNode(40);
+
+    cout << "Linked List: ";
+    list.Display();
+
+    return 0;
+}
+
+
+task 2
+#include <iostream>
+using namespace std;
+
+class Node
+{
+public:
+    int data;
+    Node* next;
+
+    Node(int value)
+    {
+        data = value;
+        next = nullptr;
+    }
+};
+
+class LinkedList
+{
+private:
+    Node* head;
+
+public:
+    LinkedList()
+    {
+        head = nullptr;
+    }
+
+    void InsertBeginning(int value)
+    {
+        Node* newNode = new Node(value);
+
+        newNode->next = head;
+        head = newNode;
+    }
+
+    void InsertEnd(int value)
+    {
+        Node* newNode = new Node(value);
+
+        if (head == nullptr)
+        {
+            head = newNode;
+            return;
+        }
+
+        Node* temp = head;
+
+        while (temp->next != nullptr)
+        {
+            temp = temp->next;
+        }
+
+        temp->next = newNode;
+    }
+
+    void DeleteValue(int value)
+    {
+        if (head == nullptr)
+        {
+            cout << "List is empty.\n";
+            return;
+        }
+
+        if (head->data == value)
+        {
+            Node* temp = head;
+            head = head->next;
+            delete temp;
+            cout << "Node deleted.\n";
+            return;
+        }
+
+        Node* temp = head;
+
+        while (temp->next != nullptr &&
+            temp->next->data != value)
+        {
+            temp = temp->next;
+        }
+
+        if (temp->next == nullptr)
+        {
+            cout << "Value not found.\n";
+        }
+        else
+        {
+            Node* del = temp->next;
+            temp->next = del->next;
+            delete del;
+            cout << "Node deleted.\n";
+        }
+    }
+
+    void Display()
+    {
+        Node* temp = head;
+
+        if (head == nullptr)
+        {
+            cout << "List is empty.\n";
+            return;
+        }
+
+        while (temp != nullptr)
+        {
+            cout << temp->data << " ";
+            temp = temp->next;
+        }
+
+        cout << endl;
+    }
+
+    ~LinkedList()
+    {
+        Node* temp;
+
+        while (head != nullptr)
+        {
+            temp = head;
+            head = head->next;
+            delete temp;
+        }
+    }
+};
+
+int main()
+{
+    LinkedList list;
+
+    list.InsertBeginning(20);
+    list.InsertBeginning(10);
+
+    list.InsertEnd(30);
+    list.InsertEnd(40);
+
+    cout << "Original List: ";
+    list.Display();
+
+    list.DeleteValue(30);
+
+    cout << "After Deletion: ";
+    list.Display();
+
+    return 0;
+}
+
+task 3
+
+#include <iostream>
+using namespace std;
+
+class Node
+{
+public:
+    int data;
+    Node* next;
+
+    Node(int value)
+    {
+        data = value;
+        next = nullptr;
+    }
+};
+
+void InsertPosition(Node*& head, int value, int position)
+{
+    Node* newNode = new Node(value);
+
+    if (position < 1)
+    {
+        cout << "Invalid position " <<  endl;
+        delete newNode;
+        return;
+    }
+
+    if (position == 1)
+    {
+        newNode->next = head;
+        head = newNode;
+        return;
+    }
+
+    Node* temp = head;
+
+    for (int i = 1; i < position - 1 && temp != nullptr; i++)
+    {
+        temp = temp->next;
+    }
+
+    if (temp == nullptr)
+    {
+        cout << "Invalid position " << endl;
+        delete newNode;
+        return;
+    }
+
+    newNode->next = temp->next;
+    temp->next = newNode; 
+
+        cout << "Node inserted"  <<endl;
+}
+
+void DeletePosition(Node*& head, int position)
+{
+    if (head == nullptr || position < 1)
+    {
+        cout << "Invalid position or empty list" << endl;
+        return;
+    }
+
+    Node* temp = head;
+
+    if (position == 1)
+    {
+        head = head->next;
+        delete temp;
+        cout << "Node deleted" << endl;
+        return;
+    }
+
+    for (int i = 1; i < position - 1 && temp != nullptr; i++)
+    {
+        temp = temp->next;
+    }
+
+    if (temp == nullptr || temp->next == nullptr)
+    {
+        cout << "Invalid position" << endl;
+        return;
+    }
+
+    Node* del = temp->next;
+    temp->next = del->next;
+    delete del;
+
+    cout << "Node deleted" << endl;
+}
+
+void Search(Node* head, int value)
+{
+    int position = 1;
+    Node* temp = head;
+
+    while (temp != nullptr)
+    {
+        if (temp->data == value)
+        {
+            cout << "Element found at position " << position << endl;
+            return;
+        }
+
+        temp = temp->next;
+        position++;
+    }
+
+    cout << "Element not found" << endl;
+}
+
+void Count(Node* head)
+{
+    int count = 0;
+    Node* temp = head;
+
+    while (temp != nullptr)
+    {
+        count++;
+        temp = temp->next;
+    }
+
+    cout << "Total nodes: " << count << endl;
+}
+
+void Display(Node* head)
+{
+    Node* temp = head;
+
+    if (head == nullptr)
+    {
+        cout << "List is empty" << endl;
+        return;
+    }
+
+    while (temp != nullptr)
+    {
+        cout << temp->data << " ";
+        temp = temp->next;
+    }
+
+    cout << endl;
+}
+
+void FreeList(Node*& head)
+{
+    while (head != nullptr)
+    {
+        Node* temp = head;
+        head = head->next;
+        delete temp;
+    }
+}
+
+int main()
+{
+    Node* head = nullptr;
+    int choice, value, position;
+
+    do
+    {
+        cout << "\n1. Insert at Position";
+        cout << "\n2. Delete at Position";
+        cout << "\n3. Search Element";
+        cout << "\n4. Count Nodes";
+        cout << "\n5. Display List";
+        cout << "\n0. Exit";
+
+        cout << "\nEnter choice: ";
+        cin >> choice;
+
+        switch (choice)
+        {
+        case 1:
+            cout << "Enter value: ";
+            cin >> value;
+
+            cout << "Enter position: ";
+            cin >> position;
+
+            InsertPosition(head, value, position);
+            break;
+
+        case 2:
+            cout << "Enter position: ";
+            cin >> position;
+
+            DeletePosition(head, position);
+            break;
+
+        case 3:
+            cout << "Enter value to search: ";
+            cin >> value;
+
+            Search(head, value);
+            break;
+
+        case 4:
+            Count(head);
+            break;
+
+        case 5:
+            Display(head);
+            break;
+
+        case 0:
+            cout << "Program ended.\n";
+            break;
+
+        default:
+            cout << "Invalid choice.\n";
+        }
+
+    } while (choice != 0);
+
+    FreeList(head);
+
+    return 0;
+}
+
+task 4
+
+#include <iostream>
+using namespace std;
+
+class Node
+{
+public:
+    string name;
+    Node* next;
+
+    Node(string n)
+    {
+        name = n;
+        next = nullptr;
+    }
+};
+
+class Hospital
+{
+private:
+    Node* head;
+
+public:
+    Hospital()
+    {
+        head = nullptr;
+    }
+
+    void AddPatient(string name)
+    {
+        Node* newNode = new Node(name);
+
+        if (head == nullptr)
+        {
+            head = newNode;
+            return;
+        }
+
+        Node* temp = head;
+
+        while (temp->next != nullptr)
+        {
+            temp = temp->next;
+        }
+
+        temp->next = newNode;
+    }
+
+    void RemovePatient(string name)
+    {
+        if (head == nullptr)
+        {
+            cout << "No patients in queue" << endl;
+            return;
+        }
+
+        if (head->name == name)
+        {
+            Node* temp = head;
+            head = head->next;
+            delete temp;
+
+            cout << "Patient removed" << endl;
+            return;
+        }
+
+        Node* temp = head;
+
+        while (temp->next != nullptr &&
+            temp->next->name != name)
+        {
+            temp = temp->next;
+        }
+
+        if (temp->next == nullptr)
+        {
+            cout << "Patient not found" << endl;
+        }
+        else
+        {
+            Node* del = temp->next;
+            temp->next = del->next;
+            delete del;
+
+            cout << "Patient removed" << endl;
+        }
+    }
+
+    void Display()
+    {
+        Node* temp = head;
+
+        if (head == nullptr)
+        {
+            cout << "No patients waiting" << endl;
+            return;
+        }
+
+        cout << "\nPatient Waiting List" << endl;
+
+        while (temp != nullptr)
+        {
+            cout << temp->name << endl;
+            temp = temp->next;
+        }
+    }
+
+    void Count()
+    {
+        int count = 0;
+        Node* temp = head;
+
+        while (temp != nullptr)
+        {
+            count++;
+            temp = temp->next;
+        }
+
+        cout << "Total patients: " << count << endl;
+    }
+
+    ~Hospital()
+    {
+        while (head != nullptr)
+        {
+            Node* temp = head;
+            head = head->next;
+            delete temp;
+        }
+    }
+};
+
+int main()
+{
+    Hospital h;
+
+    h.AddPatient("Ali");
+    h.AddPatient("Ahmed");
+    h.AddPatient("Sara");
+    h.AddPatient("Ayesha");
+
+    h.Display();
+
+    h.RemovePatient("Ahmed");
+
+    h.Display();
+
+    h.Count();
+
+    return 0;
+}
+
+task 5
+#include <iostream>
+using namespace std;
+
+class Node
+{
+public:
+    string student;
+    int priority;
+    Node* next;
+
+    Node(string name, int p)
+    {
+        student = name;
+        priority = p;
+        next = nullptr;
+    }
+};
+
+class BookQueue
+{
+private:
+    string bookName;
+    Node* head;
+
+public:
+    BookQueue(string name)
+    {
+        bookName = name;
+        head = nullptr;
+    }
+
+    void AddStudent(string name, int priority)
+    {
+        Node* newNode = new Node(name, priority);
+
+        if (head == nullptr || priority > head->priority)
+        {
+            newNode->next = head;
+            head = newNode;
+            return;
+        }
+
+        Node* temp = head;
+
+        while (temp->next != nullptr &&
+            temp->next->priority >= priority)
+        {
+            temp = temp->next;
+        }
+
+        newNode->next = temp->next;
+        temp->next = newNode;
+    }
+
+    void RemoveStudent(string name)
+    {
+        if (head == nullptr)
+        {
+            cout << "Reservation list is empty" << endl;
+            return;
+        }
+
+        if (head->student == name)
+        {
+            Node* temp = head;
+            head = head->next;
+            delete temp;
+
+            cout << "Reservation cancelled" << endl;
+            return;
+        }
+
+        Node* temp = head;
+
+        while (temp->next != nullptr &&
+            temp->next->student != name)
+        {
+            temp = temp->next;
+        }
+
+        if (temp->next == nullptr)
+        {
+            cout << "Student not found" << endl;
+        }
+        else
+        {
+            Node* del = temp->next;
+            temp->next = del->next;
+            delete del;
+
+            cout << "Reservation cancelled" << endl;
+        }
+    }
+
+    void UpdatePriority(string name, int newPriority)
+    {
+        if (head == nullptr)
+        {
+            cout << "Reservation list is empty.\n";
+            return;
+        }
+
+        Node* temp = head;
+
+        while (temp != nullptr && temp->student != name)
+        {
+            temp = temp->next;
+        }
+
+        if (temp == nullptr)
+        {
+            cout << "Student not found.\n";
+            return;
+        }
+
+        RemoveStudent(name);
+        AddStudent(name, newPriority);
+
+        cout << "Priority updated" << endl;
+    }
+
+    void Display()
+    {
+        Node* temp = head;
+
+        cout << "\nBook: " << bookName << endl;
+
+        if (head == nullptr)
+        {
+            cout << "No reservations" << endl;
+            return;
+        }
+
+        while (temp != nullptr)
+        {
+            cout << "Student: " << temp->student
+                << " | Priority: " << temp->priority << endl;
+
+            temp = temp->next;
+        }
+    }
+
+    void Count()
+    {
+        int count = 0;
+        Node* temp = head;
+
+        while (temp != nullptr)
+        {
+            count++;
+            temp = temp->next;
+        }
+
+        cout << "Total reservations: " << count << endl;
+    }
+
+    void BookReturned()
+    {
+        if (head == nullptr)
+        {
+            cout << "No student waiting for this book" << endl;
+            return;
+        }
+
+        Node* temp = head;
+
+        cout << "Book issued to: " << temp->student << endl;
+
+        head = head->next;
+        delete temp;
+    }
+
+    ~BookQueue()
+    {
+        while (head != nullptr)
+        {
+            Node* temp = head;
+            head = head->next;
+            delete temp;
+        }
+    }
+};
+
+int main()
+{
+    BookQueue book1("Data Structures");
+    BookQueue book2("Programming Fundamentals");
+
+    book1.AddStudent("Ali", 1);
+    book1.AddStudent("Ahmed", 3);
+    book1.AddStudent("Sara", 2);
+
+    book2.AddStudent("Ayesha", 2);
+    book2.AddStudent("Usman", 1);
+    book2.AddStudent("Hassan", 3);
+
+    cout << "\nInitial Reservations:";
+
+    book1.Display();
+    book2.Display();
+
+    cout << "\nUpdating Ali's Priority:\n";
+    book1.UpdatePriority("Ali", 3);
+
+    book1.Display();
+
+    cout << "\nCancelling Sara's Reservation:\n";
+    book1.RemoveStudent("Sara");
+
+    book1.Display();
+
+    cout << "\nCounting Reservations:\n";
+    book1.Count();
+    book2.Count();
+
+    cout << "\nBook Returned:\n";
+    book1.BookReturned();
+
+    book1.Display();
+
+    cout << "\nSecond Book:\n";
+    book2.Display();
+
+    return 0;
+}
