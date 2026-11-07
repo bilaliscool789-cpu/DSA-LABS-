@@ -1,0 +1,1138 @@
+task 1
+
+#include <iostream>
+using namespace std;
+
+template <typename T>
+class AbstractQueue
+{
+public:
+    virtual void enQueue(T value) = 0;
+    virtual T deQueue() = 0;
+    virtual T front() const = 0;
+    virtual bool isEmpty() const = 0;
+    virtual bool isFull() const = 0;
+    virtual ~AbstractQueue() {}
+};
+
+template <typename T>
+class myQueue : public AbstractQueue<T>
+{
+private:
+    T* arr;
+    int maxSize;
+    int frontIndex;
+    int rear;
+    int count;
+
+public:
+    myQueue(int size)
+    {
+        maxSize = size;
+        arr = new T[maxSize];
+        frontIndex = 0;
+        rear = -1;
+        count = 0;
+    }
+
+    void enQueue(T value)
+    {
+        if (isFull())
+        {
+            cout << "Queue is Full!" << endl;
+            return;
+        }
+
+        rear = (rear + 1) % maxSize;
+        arr[rear] = value;
+        count++;
+
+        cout << "Element inserted successfully." << endl;
+    }
+
+    T deQueue()
+    {
+        if (isEmpty())
+        {
+            cout << "Queue is Empty!" << endl;
+            return T();
+        }
+
+        T value = arr[frontIndex];
+        frontIndex = (frontIndex + 1) % maxSize;
+        count--;
+
+        return value;
+    }
+
+    T front() const
+    {
+        if (isEmpty())
+        {
+            cout << "Queue is Empty!" << endl;
+            return T();
+        }
+
+        return arr[frontIndex];
+    }
+
+    bool isEmpty() const
+    {
+        return count == 0;
+    }
+
+    bool isFull() const
+    {
+        return count == maxSize;
+    }
+
+    void display() const
+    {
+        if (isEmpty())
+        {
+            cout << "Queue is Empty!" << endl;
+            return;
+        }
+
+        cout << "Queue: ";
+
+        for (int i = 0; i < count; i++)
+        {
+            cout << arr[(frontIndex + i) % maxSize] << " ";
+        }
+
+        cout << endl;
+    }
+
+    ~myQueue()
+    {
+        delete[] arr;
+    }
+};
+
+int main()
+{
+    int size;
+    cout << "Enter Queue Size: ";
+    cin >> size;
+
+    if (size <= 0)
+    {
+        cout << "Invalid size!" << endl;
+        return 0;
+    }
+
+    myQueue<int> q(size);
+
+    int choice, value;
+
+    do
+    {
+        cout << "\n1. Enqueue";
+        cout << "\n2. Dequeue";
+        cout << "\n3. Front";
+        cout << "\n4. Check Empty";
+        cout << "\n5. Check Full";
+        cout << "\n6. Display";
+        cout << "\n0. Exit";
+
+        cout << "\nEnter Choice: ";
+        cin >> choice;
+
+        switch (choice)
+        {
+        case 1:
+            cout << "Enter Value: ";
+            cin >> value;
+            q.enQueue(value);
+            break;
+
+        case 2:
+            if (!q.isEmpty())
+                cout << "Removed: " << q.deQueue() << endl;
+            else
+                cout << "Queue is Empty!" << endl;
+            break;
+
+        case 3:
+            if (!q.isEmpty())
+                cout << "Front Element: " << q.front() << endl;
+            else
+                cout << "Queue is Empty!" << endl;
+            break;
+
+        case 4:
+            cout << (q.isEmpty() ? "Queue is Empty" : "Queue is Not Empty") << endl;
+            break;
+
+        case 5:
+            cout << (q.isFull() ? "Queue is Full" : "Queue is Not Full") << endl;
+            break;
+
+        case 6:
+            q.display();
+            break;
+
+        case 0:
+            cout << "Program Ended." << endl;
+            break;
+
+        default:
+            cout << "Invalid Choice!" << endl;
+        }
+
+    } while (choice != 0);
+
+    return 0;
+}
+
+task 2
+
+#include <iostream>
+using namespace std;
+
+class Stack
+{
+private:
+    int arr[100];
+    int top;
+
+public:
+    Stack()
+    {
+        top = -1;
+    }
+
+    void push(int value)
+    {
+        if (top == 99)
+        {
+            cout << "Stack is Full!" << endl;
+            return;
+        }
+
+        arr[++top] = value;
+    }
+
+    int pop()
+    {
+        if (top == -1)
+            return -1;
+
+        return arr[top--];
+    }
+
+    bool isEmpty()
+    {
+        return top == -1;
+    }
+
+    int getTop()
+    {
+        if (isEmpty())
+            return -1;
+
+        return arr[top];
+    }
+
+    int getSize()
+    {
+        return top + 1;
+    }
+
+    int getElement(int index)
+    {
+        return arr[index];
+    }
+};
+
+class Queue
+{
+private:
+    Stack s1, s2;
+
+    void transfer()
+    {
+        while (!s1.isEmpty())
+        {
+            s2.push(s1.pop());
+        }
+    }
+
+public:
+    void enQueue(int value)
+    {
+        s1.push(value);
+        cout << "Element Inserted." << endl;
+    }
+
+    int deQueue()
+    {
+        if (s2.isEmpty())
+            transfer();
+
+        if (s2.isEmpty())
+        {
+            cout << "Queue is Empty!" << endl;
+            return -1;
+        }
+
+        return s2.pop();
+    }
+
+    int front()
+    {
+        if (s2.isEmpty())
+            transfer();
+
+        if (s2.isEmpty())
+        {
+            cout << "Queue is Empty!" << endl;
+            return -1;
+        }
+
+        return s2.getTop();
+    }
+
+    void display()
+    {
+        if (s1.isEmpty() && s2.isEmpty())
+        {
+            cout << "Queue is Empty!" << endl;
+            return;
+        }
+
+        cout << "Queue: ";
+
+        for (int i = s2.getSize() - 1; i >= 0; i--)
+        {
+            cout << s2.getElement(i) << " ";
+        }
+
+        for (int i = 0; i < s1.getSize(); i++)
+        {
+            cout << s1.getElement(i) << " ";
+        }
+
+        cout << endl;
+    }
+};
+
+int main()
+{
+    Queue q;
+    int choice, value;
+
+    do
+    {
+        cout << "\n1. Enqueue";
+        cout << "\n2. Dequeue";
+        cout << "\n3. Front";
+        cout << "\n4. Display";
+        cout << "\n0. Exit";
+
+        cout << "\nEnter Choice: ";
+        cin >> choice;
+
+        switch (choice)
+        {
+        case 1:
+            cout << "Enter Value: ";
+            cin >> value;
+            q.enQueue(value);
+            break;
+
+        case 2:
+            value = q.deQueue();
+            if (value != -1)
+                cout << "Removed: " << value << endl;
+            break;
+
+        case 3:
+            value = q.front();
+            if (value != -1)
+                cout << "Front Element: " << value << endl;
+            break;
+
+        case 4:
+            q.display();
+            break;
+
+        case 0:
+            cout << "Program Ended." << endl;
+            break;
+
+        default:
+            cout << "Invalid Choice!" << endl;
+        }
+
+    } while (choice != 0);
+
+    return 0;
+}
+
+task 3
+
+#include <iostream>
+using namespace std;
+
+class Queue
+{
+private:
+    int arr[100];
+    int frontIndex, rear, count;
+
+public:
+    Queue()
+    {
+        frontIndex = 0;
+        rear = -1;
+        count = 0;
+    }
+
+    void enqueue(int value)
+    {
+        if (count == 100)
+            return;
+
+        rear = (rear + 1) % 100;
+        arr[rear] = value;
+        count++;
+    }
+
+    int dequeue()
+    {
+        if (isEmpty())
+            return -1;
+
+        int value = arr[frontIndex];
+        frontIndex = (frontIndex + 1) % 100;
+        count--;
+
+        return value;
+    }
+
+    int front()
+    {
+        if (isEmpty())
+            return -1;
+
+        return arr[frontIndex];
+    }
+
+    bool isEmpty()
+    {
+        return count == 0;
+    }
+
+    int size()
+    {
+        return count;
+    }
+
+    void display()
+    {
+        for (int i = 0; i < count; i++)
+        {
+            cout << arr[(frontIndex + i) % 100] << " ";
+        }
+
+        cout << endl;
+    }
+};
+
+void reverseFirstK(Queue& q, int k)
+{
+    int stack[100];
+    int top = -1;
+
+    if (k > q.size())
+        k = q.size();
+
+    if (k <= 1)
+        return;
+
+    for (int i = 0; i < k; i++)
+    {
+        stack[++top] = q.dequeue();
+    }
+
+    while (top != -1)
+    {
+        q.enqueue(stack[top--]);
+    }
+
+    int remaining = q.size() - k;
+
+    for (int i = 0; i < remaining; i++)
+    {
+        q.enqueue(q.dequeue());
+    }
+}
+
+int main()
+{
+    Queue q;
+    int n, value, k;
+
+    cout << "Enter number of elements: ";
+    cin >> n;
+
+    if (n < 0 || n > 100)
+    {
+        cout << "Invalid size!" << endl;
+        return 0;
+    }
+
+    cout << "Enter Queue Elements: ";
+
+    for (int i = 0; i < n; i++)
+    {
+        cin >> value;
+        q.enqueue(value);
+    }
+
+    cout << "Original Queue: ";
+    q.display();
+
+    cout << "Enter K: ";
+    cin >> k;
+
+    if (k < 0)
+    {
+        cout << "Invalid K!" << endl;
+        return 0;
+    }
+
+    reverseFirstK(q, k);
+
+    cout << "Output Queue: ";
+    q.display();
+
+    return 0;
+}
+
+task 4
+
+#include <iostream>
+using namespace std;
+
+class Queue
+{
+private:
+    struct Node
+    {
+        int ticketID;
+        Node* next;
+    };
+
+    Node* frontNode;
+    Node* rear;
+
+public:
+    Queue()
+    {
+        frontNode = NULL;
+        rear = NULL;
+    }
+
+    void enqueue(int ticket_id)
+    {
+        if (ticket_id < 1000 || ticket_id > 9999)
+        {
+            cout << "Ticket ID must be 4 digits!" << endl;
+            return;
+        }
+
+        Node* temp = frontNode;
+
+        while (temp != NULL)
+        {
+            if (temp->ticketID == ticket_id)
+            {
+                cout << "Ticket ID already exists!" << endl;
+                return;
+            }
+
+            temp = temp->next;
+        }
+
+        Node* newNode = new Node;
+        newNode->ticketID = ticket_id;
+        newNode->next = NULL;
+
+        if (frontNode == NULL)
+        {
+            frontNode = newNode;
+            rear = newNode;
+        }
+        else
+        {
+            rear->next = newNode;
+            rear = newNode;
+        }
+
+        cout << "Ticket Added Successfully." << endl;
+    }
+
+    void dequeue()
+    {
+        if (frontNode == NULL)
+        {
+            cout << "No Pending Tickets!" << endl;
+            return;
+        }
+
+        Node* temp = frontNode;
+
+        cout << "Resolved Ticket: "
+            << temp->ticketID << endl;
+
+        frontNode = frontNode->next;
+
+        if (frontNode == NULL)
+            rear = NULL;
+
+        delete temp;
+    }
+
+    void front()
+    {
+        if (frontNode == NULL)
+        {
+            cout << "No Pending Tickets!" << endl;
+            return;
+        }
+
+        cout << "Next Ticket: "
+            << frontNode->ticketID << endl;
+    }
+
+    void display()
+    {
+        if (frontNode == NULL)
+        {
+            cout << "No Pending Tickets!" << endl;
+            return;
+        }
+
+        Node* temp = frontNode;
+
+        cout << "Pending Tickets: ";
+
+        while (temp != NULL)
+        {
+            cout << temp->ticketID << " ";
+            temp = temp->next;
+        }
+
+        cout << endl;
+    }
+
+    ~Queue()
+    {
+        while (frontNode != NULL)
+        {
+            Node* temp = frontNode;
+            frontNode = frontNode->next;
+            delete temp;
+        }
+    }
+};
+
+int main()
+{
+    Queue q;
+    int choice, id;
+
+    do
+    {
+        cout << "\n1. Add New Ticket";
+        cout << "\n2. Resolve Ticket";
+        cout << "\n3. Next Ticket";
+        cout << "\n4. Display Tickets";
+        cout << "\n0. Exit";
+
+        cout << "\nEnter Choice: ";
+        cin >> choice;
+
+        switch (choice)
+        {
+        case 1:
+            cout << "Enter 4-Digit Ticket ID: ";
+            cin >> id;
+            q.enqueue(id);
+            break;
+
+        case 2:
+            q.dequeue();
+            break;
+
+        case 3:
+            q.front();
+            break;
+
+        case 4:
+            q.display();
+            break;
+
+        case 0:
+            cout << "Program Ended." << endl;
+            break;
+
+        default:
+            cout << "Invalid Choice!" << endl;
+        }
+
+    } while (choice != 0);
+
+    return 0;
+}
+
+task 5
+
+a
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Queue
+{
+private:
+    struct Node
+    {
+        string documentName;
+        Node* next;
+    };
+
+    Node* frontNode;
+    Node* rear;
+
+public:
+    Queue()
+    {
+        frontNode = NULL;
+        rear = NULL;
+    }
+
+    void enqueue(string document_name)
+    {
+        Node* newNode = new Node;
+
+        newNode->documentName = document_name;
+        newNode->next = NULL;
+
+        if (frontNode == NULL)
+        {
+            frontNode = newNode;
+            rear = newNode;
+        }
+        else
+        {
+            rear->next = newNode;
+            rear = newNode;
+        }
+
+        cout << "Print Job Added Successfully." << endl;
+    }
+
+    void dequeue()
+    {
+        if (frontNode == NULL)
+        {
+            cout << "No Print Jobs Available!" << endl;
+            return;
+        }
+
+        Node* temp = frontNode;
+
+        cout << "Printing Document: "
+            << temp->documentName << endl;
+
+        frontNode = frontNode->next;
+
+        if (frontNode == NULL)
+            rear = NULL;
+
+        delete temp;
+    }
+
+    void front()
+    {
+        if (frontNode == NULL)
+        {
+            cout << "Queue is Empty!" << endl;
+            return;
+        }
+
+        cout << "Next Document: "
+            << frontNode->documentName << endl;
+    }
+
+    void display()
+    {
+        if (frontNode == NULL)
+        {
+            cout << "No Print Jobs Available!" << endl;
+            return;
+        }
+
+        Node* temp = frontNode;
+
+        cout << "\nPending Print Jobs:\n";
+
+        while (temp != NULL)
+        {
+            cout << temp->documentName << endl;
+            temp = temp->next;
+        }
+    }
+
+    ~Queue()
+    {
+        while (frontNode != NULL)
+        {
+            Node* temp = frontNode;
+            frontNode = frontNode->next;
+            delete temp;
+        }
+    }
+};
+
+int main()
+{
+    Queue q;
+    int choice;
+    string name;
+
+    do
+    {
+        cout << "\n1. Add Print Job";
+        cout << "\n2. Print Document";
+        cout << "\n3. Check Next Document";
+        cout << "\n4. Display Print Jobs";
+        cout << "\n0. Exit";
+
+        cout << "\nEnter Choice: ";
+        cin >> choice;
+        cin.ignore();
+
+        switch (choice)
+        {
+        case 1:
+            cout << "Enter Document Name: ";
+            getline(cin, name);
+            q.enqueue(name);
+            break;
+
+        case 2:
+            q.dequeue();
+            break;
+
+        case 3:
+            q.front();
+            break;
+
+        case 4:
+            q.display();
+            break;
+
+        case 0:
+            cout << "Program Ended." << endl;
+            break;
+
+        default:
+            cout << "Invalid Choice!" << endl;
+        }
+
+    } while (choice != 0);
+
+    return 0;
+}
+
+task 6
+
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Queue
+{
+private:
+    struct Package
+    {
+        int id;
+        string address;
+        int startTime;
+        int endTime;
+        Package* next;
+    };
+
+    Package* frontNode;
+    Package* rear;
+
+    int convertTime(int time)
+    {
+        int hours = time / 100;
+        int minutes = time % 100;
+
+        if (hours < 0 || hours > 23 ||
+            minutes < 0 || minutes > 59)
+            return -1;
+
+        return hours * 60 + minutes;
+    }
+
+public:
+    Queue()
+    {
+        frontNode = NULL;
+        rear = NULL;
+    }
+
+    void enqueue(int id, string address,
+        int start, int end)
+    {
+        int s = convertTime(start);
+        int e = convertTime(end);
+
+        if (s == -1 || e == -1 || s > e)
+        {
+            cout << "Invalid Delivery Time!" << endl;
+            return;
+        }
+
+        Package* temp = frontNode;
+
+        while (temp != NULL)
+        {
+            if (temp->id == id)
+            {
+                cout << "Package ID Already Exists!" << endl;
+                return;
+            }
+
+            temp = temp->next;
+        }
+
+        Package* newNode = new Package;
+
+        newNode->id = id;
+        newNode->address = address;
+        newNode->startTime = start;
+        newNode->endTime = end;
+        newNode->next = NULL;
+
+        if (frontNode == NULL)
+        {
+            frontNode = newNode;
+            rear = newNode;
+        }
+        else
+        {
+            rear->next = newNode;
+            rear = newNode;
+        }
+
+        cout << "Package Added Successfully." << endl;
+    }
+
+    void dequeue()
+    {
+        if (frontNode == NULL)
+        {
+            cout << "No Packages Available!" << endl;
+            return;
+        }
+
+        Package* temp = frontNode;
+
+        cout << "Package Delivered. ID: "
+            << temp->id << endl;
+
+        frontNode = frontNode->next;
+
+        if (frontNode == NULL)
+            rear = NULL;
+
+        delete temp;
+    }
+
+    void front()
+    {
+        if (frontNode == NULL)
+        {
+            cout << "No Packages Available!" << endl;
+            return;
+        }
+
+        cout << "\nNext Package Details:\n";
+        cout << "ID: " << frontNode->id << endl;
+        cout << "Address: " << frontNode->address << endl;
+        cout << "Start Time: " << frontNode->startTime << endl;
+        cout << "End Time: " << frontNode->endTime << endl;
+    }
+
+    void display()
+    {
+        if (frontNode == NULL)
+        {
+            cout << "No Pending Packages!" << endl;
+            return;
+        }
+
+        Package* temp = frontNode;
+
+        cout << "\nPending Packages:\n";
+
+        while (temp != NULL)
+        {
+            cout << "\nPackage ID: " << temp->id;
+            cout << "\nAddress: " << temp->address;
+            cout << "\nStart Time: " << temp->startTime;
+            cout << "\nEnd Time: " << temp->endTime;
+            cout << endl;
+
+            temp = temp->next;
+        }
+    }
+
+    bool timeToDeliver(int currentTime)
+    {
+        if (frontNode == NULL)
+        {
+            cout << "No Packages Available!" << endl;
+            return false;
+        }
+
+        int current = convertTime(currentTime);
+
+        if (current == -1)
+        {
+            cout << "Invalid Current Time!" << endl;
+            return false;
+        }
+
+        int start = convertTime(frontNode->startTime);
+        int end = convertTime(frontNode->endTime);
+
+        if (current > end)
+        {
+            cout << "Package " << frontNode->id
+                << " has Expired!" << endl;
+
+            Package* temp = frontNode;
+            frontNode = frontNode->next;
+
+            if (frontNode == NULL)
+                rear = NULL;
+
+            delete temp;
+
+            return false;
+        }
+
+        if (current < start)
+        {
+            cout << "Delivery Time Has Not Started Yet!" << endl;
+            return false;
+        }
+
+        cout << "Package Can Be Delivered On Time." << endl;
+
+        return true;
+    }
+
+    void processPackage(int currentTime)
+    {
+        if (timeToDeliver(currentTime))
+        {
+            dequeue();
+        }
+    }
+
+    ~Queue()
+    {
+        while (frontNode != NULL)
+        {
+            Package* temp = frontNode;
+            frontNode = frontNode->next;
+            delete temp;
+        }
+    }
+};
+
+int main()
+{
+    Queue q;
+
+    int choice, id, start, end, currentTime;
+    string address;
+
+    do
+    {
+        cout << "\n1. Add Package";
+        cout << "\n2. Process Package";
+        cout << "\n3. Check Front Package";
+        cout << "\n4. Display Packages";
+        cout << "\n5. Check Delivery Time";
+        cout << "\n0. Exit";
+
+        cout << "\nEnter Choice: ";
+        cin >> choice;
+        cin.ignore();
+
+        switch (choice)
+        {
+        case 1:
+            cout << "Enter Package ID: ";
+            cin >> id;
+            cin.ignore();
+
+            cout << "Enter Recipient Address: ";
+            getline(cin, address);
+
+            cout << "Enter Start Time (HHMM): ";
+            cin >> start;
+
+            cout << "Enter End Time (HHMM): ";
+            cin >> end;
+
+            q.enqueue(id, address, start, end);
+            break;
+
+        case 2:
+            cout << "Enter Current Time (HHMM): ";
+            cin >> currentTime;
+
+            q.processPackage(currentTime);
+            break;
+
+        case 3:
+            q.front();
+            break;
+
+        case 4:
+            q.display();
+            break;
+
+        case 5:
+            cout << "Enter Current Time (HHMM): ";
+            cin >> currentTime;
+
+            q.timeToDeliver(currentTime);
+            break;
+
+        case 0:
+            cout << "Program Ended." << endl;
+            break;
+
+        default:
+            cout << "Invalid Choice!" << endl;
+        }
+
+    } while (choice != 0);
+
+    return 0;
+}
